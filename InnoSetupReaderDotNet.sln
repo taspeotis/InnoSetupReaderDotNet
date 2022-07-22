@@ -5,7 +5,11 @@ VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A971AC1B-07E4-4D1B-A3D5-BE184EA20E42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InnoSetupReaderDotNet", "InnoSetupReaderDotNet\InnoSetupReaderDotNet.csproj", "{03AA124C-4581-46F3-9D61-99C9052AF631}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InnoSetupReaderDotNet", "src\InnoSetupReaderDotNet\InnoSetupReaderDotNet.csproj", "{03AA124C-4581-46F3-9D61-99C9052AF631}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{EF4441F8-3FF1-400E-841F-B5841269EBC7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InnoSetupReaderDotNet.UnitTests", "test\InnoSetupReaderDotNet.UnitTests\InnoSetupReaderDotNet.UnitTests.csproj", "{297298A3-E5AA-4BC6-B8CE-C902B06C627E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,11 +21,16 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{03AA124C-4581-46F3-9D61-99C9052AF631} = {A971AC1B-07E4-4D1B-A3D5-BE184EA20E42}
+		{297298A3-E5AA-4BC6-B8CE-C902B06C627E} = {EF4441F8-3FF1-400E-841F-B5841269EBC7}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{03AA124C-4581-46F3-9D61-99C9052AF631}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{03AA124C-4581-46F3-9D61-99C9052AF631}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03AA124C-4581-46F3-9D61-99C9052AF631}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03AA124C-4581-46F3-9D61-99C9052AF631}.Release|Any CPU.Build.0 = Release|Any CPU
+		{297298A3-E5AA-4BC6-B8CE-C902B06C627E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{297298A3-E5AA-4BC6-B8CE-C902B06C627E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{297298A3-E5AA-4BC6-B8CE-C902B06C627E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{297298A3-E5AA-4BC6-B8CE-C902B06C627E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
