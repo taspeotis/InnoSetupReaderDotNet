@@ -1,3 +1,5 @@
+using Xunit;
+
 namespace InnoSetupReaderDotNet.UnitTests;
 
 public class InnoSetupReaderTests
@@ -6,7 +8,7 @@ public class InnoSetupReaderTests
     public void InnoSetupReader_Reads_InnoSetup()
     {
         using var reader = new InnoSetupReader("C:/Temp/Setup.exe");
-        
-        
+
+        reader.GetHeader();
     }
 }
