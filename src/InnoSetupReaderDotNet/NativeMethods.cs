@@ -26,4 +26,8 @@ internal static class NativeMethods
     /// <see href="https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadresource" />
     [DllImport(Kernel32, SetLastError = true)]
     public static extern IntPtr LoadResource(IntPtr moduleHandle, IntPtr resourceHandle);
+
+    /// <see href="https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-sizeofresource" />
+    [DllImport(Kernel32, SetLastError = true)]
+    public static extern int SizeofResource(IntPtr moduleHandle, IntPtr resourceHandle);
 }

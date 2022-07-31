@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 
 namespace InnoSetupReaderDotNet;
 
+// TODO: Is this really InnoSetupLoaderReader?
 [PublicAPI]
 public sealed class InnoSetupReader : IDisposable
 {
@@ -26,17 +27,24 @@ public sealed class InnoSetupReader : IDisposable
 
         if (resourceHandle != default)
         {
-            resourceHandle = NativeMethods.LoadResource(_moduleHandle, resourceHandle);
+            var resourceSize = NativeMethods.SizeofResource(_moduleHandle, resourceHandle);
 
-            if (resourceHandle != default)
+            if (resourceSize != default)
             {
-                var resourceData = NativeMethods.LockResource(resourceHandle);
+                resourceHandle = NativeMethods.LoadResource(_moduleHandle, resourceHandle);
 
-                // todo throw an exception if null
+                if (resourceHandle != default)
+                {
+                    var resourceData = NativeMethods.LockResource(resourceHandle);
 
-                var buffer = new byte[12];
-                Marshal.Copy(resourceData, buffer, 0, 12);
-                var @string = System.Text.Encoding.ASCII.GetString(buffer);
+                    if (resourceData == default)
+                        throw new InvalidOperationException();
+
+                    var buffer = new byte[resourceSize];
+                    Marshal.Copy(resourceData, buffer, 0, resourceSize);
+
+                    var @string = System.Text.Encoding.ASCII.GetString(buffer);
+                }
             }
 
             return resourceHandle != default;
