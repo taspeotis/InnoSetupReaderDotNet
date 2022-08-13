@@ -1,65 +1,91 @@
-﻿using System.ComponentModel;
-using System.Runtime.InteropServices;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
+using SevenZip;
+using SevenZip.Compression.LZMA;
 
 namespace InnoSetupReaderDotNet;
 
-// TODO: Is this really InnoSetupLoaderReader?
 [PublicAPI]
-public sealed class InnoSetupReader : IDisposable
+public sealed class InnoSetupReader
 {
-    private static readonly IntPtr OffsetTableResourceName = new(11111);
-
-    private readonly IntPtr _moduleHandle;
+    private readonly string _filePath;
+    private readonly SetupLoaderOffsetTable _offsetTable;
 
     public InnoSetupReader(string filePath)
     {
-        _moduleHandle = NativeMethods.LoadLibraryEx(filePath, default, LoadLibraryExFlags.LOAD_LIBRARY_AS_DATAFILE);
+        _filePath = filePath;
+        
+        using var loaderReader = new InnoSetupLoaderReader(_filePath);
 
-        if (_moduleHandle == default)
-            throw new Win32Exception();
+        _offsetTable = loaderReader.GetOffsetTable();
     }
 
-    public bool GetHeader()
+    public async Task GetSomething(CancellationToken cancellationToken)
     {
-        var resourceHandle = NativeMethods.FindResource(
-            _moduleHandle, OffsetTableResourceName, FindResourceType.RT_RCDATA);
+        await using var stream = GetStream();
+        
+        // seek to the file offset 0
+        stream.Seek(_offsetTable.Offset0, SeekOrigin.Begin);
 
-        if (resourceHandle != default)
+        // TODO: better name
+        var buffer = new byte[64];
+
+        if (await stream.ReadAsync(buffer.AsMemory(), cancellationToken) != buffer.Length)
+            throw new InvalidOperationException();
+        
+        // TODO: Log this? Also do we need to interpret (u) for unicode
+        var @string = System.Text.Encoding.ASCII.GetString(buffer).TrimEnd('\0');
+        
+        // read block header
+        // crc32
+        using var binaryReader = new BinaryReader(stream);
+        var headerCrc32 = binaryReader.ReadBytes(4);
+        var storedSize = binaryReader.ReadInt32();
+        var compressed = binaryReader.ReadBoolean();
+
+        var x = new Decoder();
+
+        // TODO: better name, lzma properties?
+        var decoderProperties = new byte[5];
+        if (await stream.ReadAsync(decoderProperties.AsMemory(), cancellationToken) != decoderProperties.Length)
+            throw new InvalidOperationException();
+
+        x.SetDecoderProperties(decoderProperties);
+
+        long outSize = 0;
+
+        for (int i = 0; i < 8; i++)
         {
-            var resourceSize = NativeMethods.SizeofResource(_moduleHandle, resourceHandle);
-
-            if (resourceSize != default)
-            {
-                resourceHandle = NativeMethods.LoadResource(_moduleHandle, resourceHandle);
-
-                if (resourceHandle != default)
-                {
-                    var resourceData = NativeMethods.LockResource(resourceHandle);
-
-                    if (resourceData == default)
-                        throw new InvalidOperationException();
-
-                    var buffer = new byte[resourceSize];
-                    Marshal.Copy(resourceData, buffer, 0, resourceSize);
-
-                    var offsetTable = new SetupLoaderOffsetTable(buffer);
-                }
-            }
-
-            return resourceHandle != default;
+            int v = stream.ReadByte();
+            if (v < 0)
+                throw (new Exception("Can't Read 1"));
+            outSize |= ((long)(byte)v) << (8 * i);
         }
 
-        throw new Win32Exception();
+        using var memoryStream = new MemoryStream();
+
+        try
+        {
+            x.Code(stream, memoryStream, 1024, 2048, NullCodeProgress.Instance);
+        }
+        catch (Exception exception)
+        {
+            ;
+        }
     }
 
-    // GetInnoSetupReader();
-    // find the resource - 11111 - rt_rcdata
-    // sizeof resource - check the right size, load resource, lock resource
-
-    void IDisposable.Dispose()
+    private Stream GetStream()
     {
-        if (!NativeMethods.FreeLibrary(_moduleHandle))
-            throw new Win32Exception();
+        return new FileStream(_filePath,
+            FileMode.Open, FileAccess.Read, FileShare.Read,
+            bufferSize: 4096, useAsync: true);
+    }
+
+    private class NullCodeProgress : ICodeProgress
+    {
+        public void SetProgress(long inSize, long outSize)
+        {
+        }
+
+        public static NullCodeProgress Instance = new();
     }
 }

@@ -1,14 +1,14 @@
-using Xunit;
+﻿using Xunit;
 
 namespace InnoSetupReaderDotNet.UnitTests;
 
-public class InnoSetupReaderTests
+public sealed class InnoSetupReaderTests
 {
     [Fact]
-    public void InnoSetupReader_Reads_InnoSetup()
+    public async Task Whatever()
     {
-        using var reader = new InnoSetupReader("C:/Temp/Setup.exe");
+        var loader = new InnoSetupReader("C:/Temp/Setup.exe");
 
-        reader.GetHeader();
+        await loader.GetSomething(default);
     }
 }
