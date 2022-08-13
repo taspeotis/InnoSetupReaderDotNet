@@ -41,36 +41,23 @@ public sealed class InnoSetupReader
         var headerCrc32 = binaryReader.ReadBytes(4);
         var storedSize = binaryReader.ReadInt32();
         var compressed = binaryReader.ReadBoolean();
-
-        var x = new Decoder();
+        
+        // TODO: CHECK CRC32
 
         // TODO: better name, lzma properties?
         var decoderProperties = new byte[5];
         if (await stream.ReadAsync(decoderProperties.AsMemory(), cancellationToken) != decoderProperties.Length)
             throw new InvalidOperationException();
 
-        x.SetDecoderProperties(decoderProperties);
+        var streamBytes = new byte[storedSize];
 
-        long outSize = 0;
+        if (await stream.ReadAsync(streamBytes.AsMemory(), cancellationToken) != streamBytes.Length)
+            throw new InvalidOperationException();
 
-        for (int i = 0; i < 8; i++)
-        {
-            int v = stream.ReadByte();
-            if (v < 0)
-                throw (new Exception("Can't Read 1"));
-            outSize |= ((long)(byte)v) << (8 * i);
-        }
+        var x = new LzmaDecoderSize();
 
-        using var memoryStream = new MemoryStream();
-
-        try
-        {
-            x.Code(stream, memoryStream, 1024, 2048, NullCodeProgress.Instance);
-        }
-        catch (Exception exception)
-        {
-            ;
-        }
+        // TODO: Just pass the streamBytes - the Length tells us
+        x.DoSomething(decoderProperties, streamBytes);
     }
 
     private Stream GetStream()

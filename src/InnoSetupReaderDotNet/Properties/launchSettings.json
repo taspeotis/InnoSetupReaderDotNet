@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "InnoSetupReaderDotNet": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
