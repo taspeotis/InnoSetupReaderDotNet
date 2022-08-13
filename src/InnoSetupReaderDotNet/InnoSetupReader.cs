@@ -43,18 +43,7 @@ public sealed class InnoSetupReader : IDisposable
                     var buffer = new byte[resourceSize];
                     Marshal.Copy(resourceData, buffer, 0, resourceSize);
 
-                    //var @string = System.Text.Encoding.ASCII.GetString(buffer);
-                    var otherString = string.Empty;
-
-                    foreach (var @byte in buffer.Take(12))
-                    {
-                        var @char = (char) @byte;
-
-                        if (char.IsAscii(@char) && char.IsLetter(@char))
-                            otherString += @char;
-                        else
-                            otherString += $"#${@byte:X2}";
-                    }
+                    var offsetTable = new SetupLoaderOffsetTable(buffer);
                 }
             }
 

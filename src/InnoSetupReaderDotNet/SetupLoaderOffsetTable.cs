@@ -21,31 +21,42 @@ public sealed class SetupLoaderOffsetTable
         Offset1 = binaryReader.ReadInt32();
         TableCrc = binaryReader.ReadBytes(4);
     }
-    
-    /// <summary><c>SetupLdrOffsetTableID</c></summary>
+
+    public static IReadOnlyCollection<byte> ExpectedId { get; } = new byte[]
+    {
+        114, 68, 108, 80, 116, 83, 205, 230, 215, 123, 11, 42
+    };
+
+    public static int ExpectedVersion { get; } = 1;
+
+    /// <summary>
+    ///     <c>SetupLdrOffsetTableID</c>
+    /// </summary>
     public byte[] Id { get; }
-    
-    /// <summary><c>SetupLdrOffsetTableVersion</c></summary>
+
+    /// <summary>
+    ///     <c>SetupLdrOffsetTableVersion</c>
+    /// </summary>
     public int Version { get; }
-    
+
     /// <summary>"Minimum expected size of setup.exe"</summary>
     public int TotalSize { get; }
-    
+
     /// <summary>"Offset of compressed setup.e32"</summary>
     public int OffsetExe { get; }
-    
+
     /// <summary>"Size of setup.e32 before compression"</summary>
     public int UncompressedSizeExe { get; }
-    
+
     /// <summary>"CRC of setup.e32 before compression"</summary>
     public IReadOnlyCollection<byte> CrcExe { get; }
-    
+
     /// <summary>"Offset of embedded setup-0.bin data"</summary>
     public int Offset0 { get; }
-    
+
     /// <summary>"Offset of embedded setup-1.bin data, or 0 when DiskSpanning=yes"</summary>
     public int Offset1 { get; }
-    
+
     /// <summary>"CRC of all prior fields in this record"</summary>
     public IReadOnlyCollection<byte> TableCrc { get; }
 }
